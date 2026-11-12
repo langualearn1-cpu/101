@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 2: Page 142 - Exercise 2 (Read and complete)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Cairo', sans-serif;
+            background-color: #f7fbf8;
+            background-image: 
+                radial-gradient(#bbf7d0 1.2px, transparent 1.2px), 
+                radial-gradient(#fde68a 1.2px, #f7fbf8 1.2px);
+            background-size: 32px 32px;
+            background-position: 0 0, 16px 16px;
+            overflow-x: hidden;
+        }
+
+        .en-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .ar-font {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .exercise-card {
+            border: 3px solid #334155;
+            border-radius: 20px;
+            box-shadow: 0 5px 0 #334155;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #334155;
+        }
+
+        .exercise-card.active-speaking {
+            background-color: #fef08a !important;
+            border-color: #ea580c !important;
+            box-shadow: 0 5px 0 #ea580c, 0 0 0 3px #fed7aa !important;
+            transform: scale(1.02);
+        }
+
+        .exercise-card.solved {
+            border-color: #059669;
+            box-shadow: 0 5px 0 #047857;
+        }
+
+        .badge-number {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #334155;
+            box-shadow: 0 2px 0 #334155;
+        }
+
+        .unit-title-shadow {
+            text-shadow: 
+                3px 3px 0 #1e293b,
+                -2px -2px 0 #1e293b,
+                2px -2px 0 #1e293b,
+                -2px 2px 0 #1e293b,
+                0 4px 0 #1e293b;
+        }
+
+        .word-bank-chip {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .word-bank-chip:hover {
+            transform: scale(1.06);
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.25);
+        }
+        .word-bank-chip.selected {
+            background-color: #0d9488 !important;
+            color: #ffffff !important;
+            border-color: #0f766e !important;
+            box-shadow: 0 0 0 3px #99f6e4 !important;
+            transform: scale(1.08);
+        }
+        .word-bank-chip.used {
+            opacity: 0.35;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
+
+        .drop-target {
+            min-width: 105px;
+            height: 40px;
+            border: 2.5px dashed #0d9488;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 12px;
+            cursor: pointer;
+            background: #f0fdfa;
+            font-size: 1.15rem;
+            font-weight: 800;
+            transition: all 0.2s;
+        }
+        .drop-target:hover {
+            background: #ccfbf1;
+            border-color: #0f766e;
+        }
+        .drop-target.filled {
+            border-style: solid;
+            background: #ffffff;
+            border-color: #0d9488;
+            font-weight: 900;
+            color: #0f766e;
+        }
+        .drop-target.correct {
+            border-color: #059669;
+            background: #ecfdf5;
+            color: #047857;
+        }
+        .drop-target.wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #b91c1c;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800">
+
+    <!-- Navigation & Control Bar -->
+    <nav class="bg-white/95 backdrop-blur-md border-b-2 border-emerald-200 sticky top-0 z-40 px-3 sm:px-4 py-2.5 shadow-sm">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-black text-emerald-800 text-sm sm:text-base">Unit 2: Chores • Activity 2 (Page 142)</span>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- زر القراءة المتتالية مرتين -->
+                <button id="playAllBtn" onclick="togglePlayFullLesson()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-xs sm:text-sm font-black shadow flex items-center gap-2 transition active:scale-95">
+                    <i id="playAllIcon" class="fa-solid fa-play"></i>
+                    <span id="playAllText">Auto Read (Repeat 2x)</span>
+                </button>
+
+                <!-- زر تبديل السرعة -->
+                <button onclick="toggleSpeechRate()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gauge-high text-teal-600"></i>
+                    <span id="speedDisplay">Calm (0.82x)</span>
+                </button>
+
+                <!-- زر إظهار / إخفاء الحلول -->
+                <button onclick="toggleAllAnswers()" id="showAnswersBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs sm:text-sm font-black shadow flex items-center gap-1.5 transition active:scale-95">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Show Answers</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Learning Content -->
+    <main class="max-w-6xl w-full mx-auto px-3 sm:px-4 py-5 flex-grow">
+
+        <header class="relative mb-5 text-center select-none">
+            <div class="flex items-center justify-center gap-3 flex-wrap mb-1">
+                <div class="w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 text-white flex items-center justify-center font-black text-3xl sm:text-4xl shadow-lg border-4 border-white ring-4 ring-emerald-300">
+                    2
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-black en-font tracking-wide text-rose-500 unit-title-shadow">
+                    <span class="text-indigo-400">UNIT </span>
+                    <span class="text-amber-400">2: </span>
+                    <span class="text-rose-400">CHORES</span>
+                </h2>
+            </div>
+
+            <!-- عنوان التمرين 2 في صفحة 142 -->
+            <div class="inline-flex items-center gap-2 bg-gradient-to-r from-teal-700 to-emerald-800 text-white px-5 sm:px-7 py-2 rounded-2xl font-black text-base sm:text-lg shadow-md border-2 border-teal-900 my-2">
+                <span class="bg-amber-400 text-slate-900 w-7 h-7 rounded-full flex items-center justify-center text-sm font-black shadow-inner">2</span>
+                <span>Read and complete with words from the box.</span>
+                <span class="ar-font text-xs font-bold text-teal-100 hidden sm:inline">(اقرأ وأكمل الجمل بالكلمات المناسبة)</span>
+            </div>
+
+            <!-- شارات التوجيه -->
+            <div class="flex items-center justify-center gap-3 mt-2 flex-wrap">
+                <div class="bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-repeat text-emerald-600"></i>
+                    <span>Repeats 2x • تكرار مرتين</span>
+                </div>
+
+                <div class="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-volume-high text-amber-700"></i>
+                    <span>اضغط على أي بطاقة أو عبارة للاستماع للنطق</span>
+                </div>
+            </div>
+
+            <!-- Word Bank Box (صندوق الكلمات) -->
+            <div class="mt-4 max-w-2xl mx-auto bg-white p-3.5 sm:p-4 rounded-2xl border-2 border-teal-300 shadow-md">
+                <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-teal-100 flex-wrap">
+                    <span class="text-xs sm:text-sm font-black text-teal-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-box-open text-teal-600"></i>
+                        <span>Word Bank • صندوق الكلمات</span>
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="shuffleWordBank()" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition active:scale-95" title="خلط ترتيب الكلمات">
+                            <i class="fa-solid fa-shuffle"></i>
+                            <span>خلط الكلمات • Shuffle</span>
+                        </button>
+                        <span class="ar-font text-[11px] font-bold text-slate-500 hidden sm:inline">انقر على الكلمة ثم انقر على الفراغ لوضعها</span>
+                    </div>
+                </div>
+                <div id="wordBankList" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 py-1">
+                    <!-- تُولد الكلمات برمجياً -->
+                </div>
+            </div>
+        </header>
+
+        <!-- شبكة الأسئلة 6 بطاقات (2 في الموبايل، 3 في الشاشات الواسعة) -->
+        <div id="exerciseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            <!-- سيتم توليد الـ 6 بطاقات برمجياً مع دعم رفع وتخزين الصور الدائم -->
+        </div>
+
+        <!-- شارة رقم الصفحة 142 أسفل التمرين -->
+        <div class="mt-8 mb-4 flex items-center justify-center">
+            <div class="relative group cursor-pointer select-none">
+                <div class="absolute -inset-1.5 bg-gradient-to-r from-teal-400 via-amber-400 to-pink-500 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition duration-300"></div>
+
+                <div class="relative bg-gradient-to-b from-white to-amber-50/90 border-3 border-teal-600 rounded-2xl px-6 py-2.5 sm:px-8 sm:py-3 shadow-lg flex items-center gap-3 sm:gap-4">
+                    <div class="flex items-center gap-1 text-base sm:text-lg">
+                        <span class="text-amber-400 animate-spin" style="animation-duration: 6s;">✦</span>
+                        <span class="text-teal-600">📖</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-600 to-teal-700 text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-md border-2 border-white ring-2 ring-emerald-300 transform -rotate-3 hover:rotate-0 transition-transform">
+                            142
+                        </div>
+                        <div class="text-left leading-tight">
+                            <span class="en-font font-black text-lg sm:text-xl text-teal-800 tracking-wide block">
+                                PAGE <span class="text-rose-500">142</span>
+                            </span>
+                            <span dir="rtl" class="text-xs sm:text-sm font-bold text-amber-700 ar-font block">
+                                📖 صفحة ١٤٢ • التمرين ٢ (إكمال الفراغ)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-base sm:text-lg">
+                        <span class="text-rose-500">⭐</span>
+                        <span class="text-amber-400 animate-spin" style="animation-duration: 6s; animation-direction: reverse;">✦</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Reading Toast التنبيه الصوتي الحي -->
+    <div id="liveReadingToast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md text-white px-5 py-2.5 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-8 max-w-[94vw]">
+        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-ping flex-shrink-0"></div>
+        <div class="truncate">
+            <span class="text-[11px] text-slate-400 block font-sans" id="toastSpeakerLabel">Reading with Native Speaker:</span>
+            <span id="toastWord" class="en-font font-black text-amber-300 text-base sm:text-lg tracking-wide">...</span>
+        </div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer class="bg-white/90 border-t border-emerald-200 mt-10 py-5 px-4 text-center text-xs text-slate-600">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p class="font-bold">
+                Unit 2: Chores • Activity 2 (Page 142) • Read and complete with words from the box
+            </p>
+            <div class="flex items-center gap-2">
+                <span class="bg-indigo-50 text-indigo-800 px-3 py-1 rounded-full font-bold border border-indigo-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-headset text-indigo-600"></i>
+                    <span id="footerSpeakerName">Native English Voice</span>
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // مصفوفة البيانات الدقيقة للـ 6 جمل في التمرين 2 (صفحة 142)
+        const exerciseItems = [
+            {
+                id: 1,
+                part1: "Sahar",
+                answer: "feeds",
+                part2: "the animals in the evening.",
+                fullPhrase: "Sahar feeds the animals in the evening.",
+                arabic: "سحر تطعم الحيوانات في المساء.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#fef3c7"/>
+                    <rect x="0" y="110" width="300" height="50" fill="#86efac"/>
+                    <circle cx="95" cy="55" r="14" fill="#fed7aa"/>
+                    <path d="M85 45 Q95 38 105 45 Z" fill="#78350f"/>
+                    <rect x="88" y="70" width="16" height="36" rx="4" fill="#ec4899"/>
+                    <ellipse cx="185" cy="125" rx="18" ry="12" fill="#fb923c"/>
+                    <circle cx="170" cy="118" r="9" fill="#fb923c"/>
+                    <polygon points="166,110 170,116 163,114" fill="#ea580c"/>
+                    <polygon points="174,110 178,116 171,114" fill="#ea580c"/>
+                    <ellipse cx="140" cy="132" rx="14" ry="6" fill="#0284c7"/>
+                </svg>`
+            },
+            {
+                id: 2,
+                part1: "Grandma",
+                answer: "sets",
+                part2: "the table when she finishes cooking.",
+                fullPhrase: "Grandma sets the table when she finishes cooking.",
+                arabic: "الجدة ترتب المائدة عندما تنتهي من الطهي.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#eff6ff"/>
+                    <rect x="35" y="80" width="230" height="65" rx="8" fill="#f472b6" stroke="#db2777" stroke-width="3"/>
+                    <ellipse cx="90" cy="100" rx="20" ry="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <ellipse cx="210" cy="100" rx="20" ry="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle cx="150" cy="45" r="14" fill="#fed7aa"/>
+                    <path d="M136 40 Q150 32 164 40 Z" fill="#94a3b8"/>
+                    <rect x="140" y="60" width="20" height="32" rx="4" fill="#a855f7"/>
+                    <path d="M135 70 L100 95 M165 70 L200 95" stroke="#fed7aa" stroke-width="4" stroke-linecap="round"/>
+                </svg>`
+            },
+            {
+                id: 3,
+                part1: "Yousef always",
+                answer: "makes",
+                part2: "his bed when he gets up.",
+                fullPhrase: "Yousef always makes his bed when he gets up.",
+                arabic: "يوسف يرتب سريره دائماً عندما ينهض من النوم.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#fdf4ff"/>
+                    <rect x="30" y="70" width="240" height="75" rx="8" fill="#c084fc" stroke="#7e22ce" stroke-width="3"/>
+                    <rect x="40" y="55" width="60" height="25" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle cx="160" cy="42" r="13" fill="#fed7aa"/>
+                    <path d="M150 34 Q160 28 170 34 Z" fill="#b45309"/>
+                    <rect x="152" y="55" width="18" height="30" rx="4" fill="#3b82f6"/>
+                    <path d="M145 68 L110 88 M175 68 L210 88" stroke="#fed7aa" stroke-width="4" stroke-linecap="round"/>
+                </svg>`
+            },
+            {
+                id: 4,
+                part1: "Grandpa",
+                answer: "cuts",
+                part2: "the grass on Saturdays.",
+                fullPhrase: "Grandpa cuts the grass on Saturdays.",
+                arabic: "الجد يقص العشب في أيام السبت.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#f0fdf4"/>
+                    <rect x="0" y="85" width="300" height="75" fill="#4ade80"/>
+                    <line x1="0" y1="85" x2="300" y2="85" stroke="#16a34a" stroke-width="3"/>
+                    <rect x="140" y="90" width="55" height="35" rx="6" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                    <circle cx="150" cy="125" r="9" fill="#1e293b"/>
+                    <circle cx="185" cy="125" r="9" fill="#1e293b"/>
+                    <line x1="140" y1="95" x2="95" y2="65" stroke="#64748b" stroke-width="4"/>
+                    <circle cx="85" cy="45" r="13" fill="#fed7aa"/>
+                    <path d="M73 40 Q85 34 97 40 Z" fill="#94a3b8"/>
+                    <rect x="76" y="58" width="18" height="32" rx="3" fill="#0284c7"/>
+                </svg>`
+            },
+            {
+                id: 5,
+                part1: "My cousin doesn’t like to",
+                answer: "wash",
+                part2: "the dishes.",
+                fullPhrase: "My cousin doesn't like to wash the dishes.",
+                arabic: "ابن عمي لا يحب غسل الصحون.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#ecfeff"/>
+                    <rect x="60" y="75" width="180" height="70" rx="6" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>
+                    <rect x="80" y="85" width="140" height="45" rx="4" fill="#0284c7" opacity="0.3"/>
+                    <path d="M150 55 L150 72" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="120" cy="100" r="14" fill="#ffffff" stroke="#38bdf8" stroke-width="2"/>
+                    <circle cx="105" cy="92" r="5" fill="#bae6fd"/>
+                    <circle cx="150" cy="40" r="12" fill="#fed7aa"/>
+                    <rect x="143" y="52" width="16" height="28" rx="3" fill="#f97316"/>
+                </svg>`
+            },
+            {
+                id: 6,
+                part1: "My uncle never",
+                answer: "sweeps",
+                part2: "the floor.",
+                fullPhrase: "My uncle never sweeps the floor.",
+                arabic: "عمي لا يكنس الأرضية أبداً.",
+                svg: `
+                <svg viewBox="0 0 300 160" class="w-full h-full object-cover">
+                    <rect width="300" height="160" fill="#fff7ed"/>
+                    <line x1="0" y1="135" x2="300" y2="135" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle cx="130" cy="48" r="14" fill="#fed7aa"/>
+                    <rect x="122" y="62" width="18" height="38" rx="4" fill="#10b981"/>
+                    <line x1="138" y1="75" x2="190" y2="135" stroke="#92400e" stroke-width="4"/>
+                    <polygon points="180,130 205,120 215,140 185,142" fill="#eab308" stroke="#ca8a04" stroke-width="2"/>
+                </svg>`
+            }
+        ];
+
+        let wordBankWords = ["cuts", "wash", "sweeps", "makes", "sets", "feeds"];
+        let selectedWord = null;
+        let userAnswers = {};
+
+        // سرعة ونبرة مطابقة تماماً لصوت المتحدث في بوستر My Daily Routine
+        let currentSpeechRate = 0.82;
+        let isPlayingFullLesson = false;
+        let currentFullIndex = 0;
+        let activeTimeouts = [];
+        let availableVoices = [];
+        let lockedNativeVoice = null;
+        let currentAudioPlayer = null;
+        let showingAnswers = false;
+        let currentSpeechSessionId = 0;
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            if (arr[0] === 'feeds' || (arr[0] === 'feeds' && arr[1] === 'sets')) {
+                const last = arr.pop();
+                arr.unshift(last);
+            }
+            return arr;
+        }
+
+        function shuffleWordBank(notify = true) {
+            const previous = [...wordBankWords].join(',');
+            let attempts = 0;
+            do {
+                shuffleArray(wordBankWords);
+                attempts++;
+            } while (attempts < 10 && wordBankWords.join(',') === previous);
+
+            renderWordBank();
+            if (notify) {
+                showToast("تم خلط الكلمات عشوائياً 🎲");
+                setTimeout(hideToast, 1200);
+            }
+        }
+
+        shuffleArray(wordBankWords);
+
+        function renderWordBank() {
+            const container = document.getElementById('wordBankList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const usedWords = Object.values(userAnswers);
+
+            wordBankWords.forEach(word => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const isSelected = selectedWord === word;
+                const isUsed = usedWords.includes(word);
+
+                btn.className = `word-bank-chip px-4 sm:px-5 py-2 rounded-xl border-2 font-black en-font text-base sm:text-lg md:text-xl shadow-sm transition ${
+                    isSelected ? 'selected' : isUsed ? 'used bg-slate-100 border-slate-200 text-slate-400' : 'bg-teal-50 border-teal-200 text-teal-800 hover:bg-teal-100'
+                }`;
+                btn.innerText = word;
+                btn.onclick = () => {
+                    if (isUsed) return;
+                    if (selectedWord === word) {
+                        selectedWord = null;
+                    } else {
+                        selectedWord = word;
+                        speakPhraseOnce(word);
+                    }
+                    renderWordBank();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderExerciseCards() {
+            const grid = document.getElementById('exerciseGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            exerciseItems.forEach((item) => {
+                const card = document.createElement('div');
+                card.id = `card-${item.id}`;
+                card.className = 'exercise-card p-3 sm:p-4 flex flex-col justify-between cursor-pointer group';
+                card.onclick = (e) => {
+                    if (!e.target.closest('.drop-target') && !e.target.closest('button') && !e.target.closest('input')) {
+                        readCard(item.id);
+                    }
+                };
+
+                const currentFilled = userAnswers[item.id] || '';
+                const isCorrect = currentFilled.toLowerCase() === item.answer.toLowerCase();
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="badge-number bg-white rounded-lg flex items-center justify-center font-black text-sm text-slate-900">
+                                    ${item.id}
+                                </span>
+                                <span class="text-[11px] font-bold text-slate-400 group-hover:text-emerald-600 transition">
+                                    <i class="fa-solid fa-volume-high mr-1"></i> Tap to listen
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" 
+                                    onclick="event.stopPropagation(); triggerImageUpload(${item.id})" 
+                                    title="Add or change image • إضافة أو تغيير الصورة"
+                                    class="w-7 h-7 rounded-full bg-slate-100 hover:bg-teal-100 text-slate-600 hover:text-teal-700 flex items-center justify-center text-xs transition active:scale-95 border border-slate-200">
+                                    <i class="fa-solid fa-image"></i>
+                                </button>
+                                <input type="file" 
+                                    id="file-upload-${item.id}" 
+                                    accept="image/*" 
+                                    class="hidden" 
+                                    onchange="handleImageUpload(event, ${item.id})" />
+
+                                <span id="check-icon-${item.id}" class="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="image-container-${item.id}" class="w-full h-56 sm:h-64 rounded-2xl overflow-hidden mb-3.5 border-2 border-slate-200 shadow-inner bg-slate-50 flex items-center justify-center relative">
+                            ${item.svg}
+                        </div>
+
+                        <div class="p-3 sm:p-4 bg-slate-50 rounded-2xl border-2 border-slate-200 en-font text-base sm:text-lg md:text-xl font-black text-slate-800 leading-relaxed text-center flex flex-wrap items-center justify-center gap-2" dir="ltr">
+                            <span>${item.part1}</span>
+                            <span id="target-${item.id}" 
+                                onclick="event.stopPropagation(); handleTargetClick(${item.id})" 
+                                class="drop-target ${currentFilled ? 'filled' : ''} ${currentFilled ? (isCorrect ? 'correct' : 'wrong') : ''}">
+                                ${currentFilled ? currentFilled : '<span class="text-sm text-slate-400 font-bold">...</span>'}
+                            </span>
+                            <span>${item.part2}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-col items-center justify-center text-center gap-1.5">
+                        <span id="solution-${item.id}" class="hidden text-sm sm:text-base font-black text-teal-700 en-font bg-teal-50 px-3 py-1 rounded-lg border border-teal-200 shadow-xs">
+                            ${item.answer}
+                        </span>
+                        <span dir="rtl" class="text-sm sm:text-base font-bold text-slate-600 ar-font text-center block w-full">
+                            ${item.arabic}
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateSingleCardUI(itemId) {
+            const item = exerciseItems.find(it => it.id === itemId);
+            if (!item) return;
+
+            const targetEl = document.getElementById(`target-${itemId}`);
+            const checkIcon = document.getElementById(`check-icon-${itemId}`);
+            const solutionEl = document.getElementById(`solution-${itemId}`);
+            const cardEl = document.getElementById(`card-${itemId}`);
+            const currentFilled = userAnswers[itemId] || '';
+
+            if (targetEl) {
+                targetEl.className = 'drop-target';
+                if (currentFilled) {
+                    targetEl.classList.add('filled');
+                    const isCorrect = currentFilled.toLowerCase() === item.answer.toLowerCase();
+                    if (isCorrect) {
+                        targetEl.classList.add('correct');
+                        if (checkIcon) {
+                            checkIcon.className = 'w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shadow';
+                            checkIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                        }
+                        if (cardEl) cardEl.classList.add('solved');
+                    } else {
+                        targetEl.classList.add('wrong');
+                        if (checkIcon) {
+                            checkIcon.className = 'w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs shadow';
+                            checkIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                        }
+                        if (cardEl) cardEl.classList.remove('solved');
+                    }
+                    targetEl.innerText = currentFilled;
+                } else {
+                    targetEl.innerHTML = '<span class="text-sm text-slate-400 font-bold">...</span>';
+                    if (checkIcon) {
+                        checkIcon.className = 'w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xs';
+                        checkIcon.innerHTML = '<i class="fa-solid fa-pencil"></i>';
+                    }
+                    if (cardEl) cardEl.classList.remove('solved');
+                }
+            }
+
+            if (solutionEl) {
+                if (showingAnswers) {
+                    solutionEl.classList.remove('hidden');
+                } else {
+                    solutionEl.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleTargetClick(itemId) {
+            const item = exerciseItems.find(it => it.id === itemId);
+            if (!item) return;
+
+            if (userAnswers[itemId]) {
+                delete userAnswers[itemId];
+                renderWordBank();
+                updateSingleCardUI(itemId);
+                return;
+            }
+
+            if (selectedWord) {
+                userAnswers[itemId] = selectedWord;
+                selectedWord = null;
+
+                const isCorrect = userAnswers[itemId].toLowerCase() === item.answer.toLowerCase();
+                if (isCorrect && typeof confetti === 'function') {
+                    confetti({ particleCount: 25, spread: 45, origin: { y: 0.7 } });
+                }
+
+                renderWordBank();
+                updateSingleCardUI(itemId);
+
+                speakPhraseOnce(item.fullPhrase);
+            } else {
+                showToast("اختر كلمة من صندوق الكلمات أولاً ثم اضغط هنا!");
+            }
+        }
+
+        function triggerImageUpload(itemId) {
+            const fileInput = document.getElementById(`file-upload-${itemId}`);
+            if (fileInput) fileInput.click();
+        }
+
+        function handleImageUpload(event, itemId) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
+                    canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                    try {
+                        localStorage.setItem(`saved_p142_ex2_img_${itemId}`, compressedDataUrl);
+                    } catch (err) {
+                        console.warn('LocalStorage limit reached', err);
+                    }
+
+                    applyImageToCard(itemId, compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyImageToCard(itemId, imageUrl) {
+            const container = document.getElementById(`image-container-${itemId}`);
+            if (container) {
+                container.innerHTML = `
+                    <img src="${imageUrl}" alt="Exercise ${itemId}" class="w-full h-full object-cover" />
+                    <button onclick="event.stopPropagation(); resetCardImage(${itemId})" title="Reset to default drawing • استعادة الرسم الافتراضي" class="absolute top-1.5 right-1.5 w-6 h-6 bg-slate-900/70 hover:bg-slate-900 text-white rounded-full flex items-center justify-center text-[10px] shadow transition">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                `;
+            }
+        }
+
+        function resetCardImage(itemId) {
+            const item = exerciseItems.find(it => it.id === itemId);
+            const container = document.getElementById(`image-container-${itemId}`);
+            if (item && container) {
+                container.innerHTML = item.svg;
+            }
+            try {
+                localStorage.removeItem(`saved_p142_ex2_img_${itemId}`);
+            } catch (err) {}
+            const fileInput = document.getElementById(`file-upload-${itemId}`);
+            if (fileInput) fileInput.value = '';
+        }
+
+        function restoreAllSavedImages() {
+            exerciseItems.forEach(item => {
+                try {
+                    const savedImg = localStorage.getItem(`saved_p142_ex2_img_${item.id}`);
+                    if (savedImg) {
+                        applyImageToCard(item.id, savedImg);
+                    }
+                } catch(e) {}
+            });
+        }
+
+        function toggleAllAnswers() {
+            showingAnswers = !showingAnswers;
+            const btn = document.getElementById('showAnswersBtn');
+
+            exerciseItems.forEach(item => {
+                if (showingAnswers) {
+                    userAnswers[item.id] = item.answer;
+                } else {
+                    delete userAnswers[item.id];
+                }
+                updateSingleCardUI(item.id);
+            });
+
+            selectedWord = null;
+            renderWordBank();
+
+            if (btn) {
+                if (showingAnswers) {
+                    btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i><span>Hide Answers</span>';
+                    btn.classList.replace('bg-amber-500', 'bg-slate-700');
+                    btn.classList.replace('hover:bg-amber-600', 'hover:bg-slate-800');
+                } else {
+                    btn.innerHTML = '<i class="fa-solid fa-key"></i><span>Show Answers</span>';
+                    btn.classList.replace('bg-slate-700', 'bg-amber-500');
+                    btn.classList.replace('hover:bg-slate-800', 'hover:bg-amber-600');
+                }
+            }
+        }
+
+        // اختيار نفس صوت المتحدث الواضح والهادئ المستخدم في بوستر My Daily Routine
+        function findBestRoutineVoice(voicesList) {
+            if (!voicesList || voicesList.length === 0) return null;
+
+            const enVoices = voicesList.filter(v =>
+                v.lang && v.lang.toLowerCase().startsWith('en') && !v.name.toLowerCase().includes('william')
+            );
+            const list = enVoices.length > 0 ? enVoices : voicesList;
+
+            const priorityNames = [
+                'aria online (natural)',
+                'jenny online (natural)',
+                'ava online (natural)',
+                'ana online (natural)',
+                'michelle online (natural)',
+                'sonia online (natural)',
+                'libby online (natural)',
+                'clara online (natural)',
+                'natasha online (natural)',
+                'aria',
+                'jenny',
+                'ava',
+                'samantha',
+                'google us english',
+                'allison',
+                'susan',
+                'zira',
+                'linda',
+                'catherine',
+                'karen',
+                'moira'
+            ];
+
+            for (const keyword of priorityNames) {
+                const match = list.find(v => v.name.toLowerCase().includes(keyword));
+                if (match) return match;
+            }
+
+            const anyNatural = list.find(v =>
+                !v.name.toLowerCase().includes('william') &&
+                v.name.toLowerCase().includes('natural')
+            );
+            if (anyNatural) return anyNatural;
+
+            return list[0] || null;
+        }
+
+        function populateVoiceList() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || voices.length === 0) return;
+
+            availableVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en') && !v.name.toLowerCase().includes('william'));
+            if (availableVoices.length === 0) {
+                availableVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+            }
+
+            const best = findBestRoutineVoice(voices);
+            if (best) {
+                lockedNativeVoice = best;
+                updateSpeakerDisplay(best.name);
+            }
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                populateVoiceList();
+            };
+        }
+
+        function updateSpeakerDisplay(speakerName) {
+            const cleanName = speakerName ? speakerName.replace(/Google|Microsoft|Apple|Desktop|English|United States|Canada|\(\)/gi, '').trim() : 'Aria (Natural)';
+            const footerBadge = document.getElementById('footerSpeakerName');
+            const toastLabel = document.getElementById('toastSpeakerLabel');
+
+            if (footerBadge) footerBadge.innerText = `Native Voice: ${cleanName}`;
+            if (toastLabel) toastLabel.innerText = `Reading with ${cleanName}:`;
+        }
+
+        // النطق الصوتي المطابق تماماً لبوستر My Daily Routine
+        function speakSentenceWithLockedVoice(text, onFinished) {
+            currentSpeechSessionId++;
+            const sessionId = currentSpeechSessionId;
+
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                    window.speechSynthesis.cancel();
+                }
+
+                const startTimer = setTimeout(() => {
+                    if (sessionId !== currentSpeechSessionId) return;
+
+                    const voices = window.speechSynthesis.getVoices();
+                    const bestVoice = findBestRoutineVoice(voices) || lockedNativeVoice;
+                    if (bestVoice) {
+                        lockedNativeVoice = bestVoice;
+                        updateSpeakerDisplay(bestVoice.name);
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    window.activeUtteranceRef = utterance;
+                    if (bestVoice) {
+                        utterance.voice = bestVoice;
+                        utterance.lang = bestVoice.lang || 'en-US';
+                    } else {
+                        utterance.lang = 'en-US';
+                    }
+                    utterance.rate = Math.min(currentSpeechRate, 0.82);
+                    utterance.pitch = 1.02;
+
+                    let finished = false;
+                    const done = () => {
+                        if (finished || sessionId !== currentSpeechSessionId) return;
+                        finished = true;
+                        if (onFinished) onFinished();
+                    };
+
+                    utterance.onend = done;
+                    utterance.onerror = done;
+
+                    window.speechSynthesis.speak(utterance);
+                }, 55);
+                activeTimeouts.push(startTimer);
+            } else {
+                try {
+                    if (currentAudioPlayer) {
+                        currentAudioPlayer.pause();
+                        currentAudioPlayer = null;
+                    }
+                    const cleanText = encodeURIComponent(text);
+                    const cloudAudioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${cleanText}&tl=en&client=tw-ob`;
+                    const audio = new Audio(cloudAudioUrl);
+                    currentAudioPlayer = audio;
+                    audio.playbackRate = currentSpeechRate;
+                    audio.onended = () => { if (onFinished) onFinished(); };
+                    audio.onerror = () => { if (onFinished) onFinished(); };
+                    audio.play().catch(() => { if (onFinished) onFinished(); });
+                } catch(e) {
+                    if (onFinished) onFinished();
+                }
+            }
+        }
+
+        function speakPhraseOnce(text) {
+            resetAllHighlights();
+            showToast(text);
+            speakSentenceWithLockedVoice(text, () => {
+                setTimeout(hideToast, 500);
+            });
+        }
+
+        function resetAllHighlights() {
+            currentSpeechSessionId++;
+            activeTimeouts.forEach(t => clearTimeout(t));
+            activeTimeouts = [];
+
+            if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+                window.speechSynthesis.cancel();
+            }
+            if (currentAudioPlayer) {
+                currentAudioPlayer.pause();
+                currentAudioPlayer = null;
+            }
+
+            document.querySelectorAll('.exercise-card').forEach(b => b.classList.remove('active-speaking'));
+            hideToast();
+        }
+
+        function readCardTwice(itemId, onFinished = null) {
+            resetAllHighlights();
+
+            const item = exerciseItems.find(it => it.id === itemId);
+            const cardEl = document.getElementById(`card-${itemId}`);
+            if (!item || !cardEl) {
+                if (onFinished) onFinished();
+                return;
+            }
+
+            cardEl.classList.add('active-speaking');
+            showToast(`${item.fullPhrase} (1/2)`);
+
+            speakSentenceWithLockedVoice(item.fullPhrase, () => {
+                const pauseTimer = setTimeout(() => {
+                    showToast(`${item.fullPhrase} (2/2)`);
+                    speakSentenceWithLockedVoice(item.fullPhrase, () => {
+                        const finishTimer = setTimeout(() => {
+                            cardEl.classList.remove('active-speaking');
+                            hideToast();
+                            if (onFinished) onFinished();
+                        }, 400);
+                        activeTimeouts.push(finishTimer);
+                    });
+                }, 400);
+                activeTimeouts.push(pauseTimer);
+            });
+        }
+
+        function readCard(itemId) {
+            stopAutoPlay();
+            readCardTwice(itemId);
+        }
+
+        function startAutoDirectPlay() {
+            resetAllHighlights();
+            isPlayingFullLesson = true;
+            currentFullIndex = 0;
+            updatePlayBtnUI();
+            playNextExerciseSequence();
+        }
+
+        function togglePlayFullLesson() {
+            if (isPlayingFullLesson) {
+                stopAutoPlay();
+            } else {
+                startAutoDirectPlay();
+            }
+        }
+
+        function stopAutoPlay() {
+            isPlayingFullLesson = false;
+            resetAllHighlights();
+            updatePlayBtnUI();
+        }
+
+        function updatePlayBtnUI() {
+            const btn = document.getElementById('playAllBtn');
+            const icon = document.getElementById('playAllIcon');
+            const text = document.getElementById('playAllText');
+            if (!btn) return;
+
+            if (isPlayingFullLesson) {
+                icon.className = 'fa-solid fa-stop';
+                text.innerText = 'Pause Reading';
+                btn.classList.replace('from-emerald-500', 'from-rose-500');
+                btn.classList.replace('to-teal-600', 'to-red-600');
+            } else {
+                icon.className = 'fa-solid fa-play';
+                text.innerText = 'Auto Read (Repeat 2x)';
+                btn.classList.replace('from-rose-500', 'from-emerald-500');
+                btn.classList.replace('to-red-600', 'to-teal-600');
+            }
+        }
+
+        function playNextExerciseSequence() {
+            if (!isPlayingFullLesson || currentFullIndex >= exerciseItems.length) {
+                stopAutoPlay();
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
+                }
+                return;
+            }
+
+            const current = exerciseItems[currentFullIndex];
+            const card = document.getElementById(`card-${current.id}`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            readCardTwice(current.id, () => {
+                if (isPlayingFullLesson) {
+                    currentFullIndex++;
+                    const nextTimer = setTimeout(playNextExerciseSequence, 500);
+                    activeTimeouts.push(nextTimer);
+                }
+            });
+        }
+
+        function toggleSpeechRate() {
+            const display = document.getElementById('speedDisplay');
+            if (currentSpeechRate === 0.82) {
+                currentSpeechRate = 0.68;
+                if (display) display.innerText = 'Slow (0.68x)';
+            } else if (currentSpeechRate === 0.68) {
+                currentSpeechRate = 0.92;
+                if (display) display.innerText = 'Normal (0.92x)';
+            } else {
+                currentSpeechRate = 0.82;
+                if (display) display.innerText = 'Calm (0.82x)';
+            }
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('liveReadingToast');
+            const toastText = document.getElementById('toastWord');
+            if (toastText) toastText.innerText = text;
+            if (toast) {
+                toast.classList.remove('opacity-0', 'translate-y-8');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('liveReadingToast');
+            if (toast) {
+                toast.classList.add('opacity-0', 'translate-y-8');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }
+        }
+
+        let appInitialized = false;
+        function initApp() {
+            if (appInitialized) {
+                populateVoiceList();
+                return;
+            }
+            appInitialized = true;
+            shuffleArray(wordBankWords);
+            renderWordBank();
+            renderExerciseCards();
+            restoreAllSavedImages();
+            populateVoiceList();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+
+        window.onload = function() {
+            initApp();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    populateVoiceList();
+                };
+            }
+        };
+    </script>
+</body>
+</html>
